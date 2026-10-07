@@ -1,0 +1,86 @@
+"""Repositories export module for ProgramSaathi."""
+
+from programsaathi.repositories.base import BaseRepository, InMemoryRepository
+from programsaathi.repositories.project import (
+    ProjectRepository,
+    InMemoryProjectRepository,
+    MilestoneRepository,
+    InMemoryMilestoneRepository,
+    StakeholderRepository,
+    InMemoryStakeholderRepository,
+)
+from programsaathi.repositories.work_item import (
+    RequirementRepository,
+    InMemoryRequirementRepository,
+    UserStoryRepository,
+    InMemoryUserStoryRepository,
+    TaskRepository,
+    InMemoryTaskRepository,
+    DependencyRepository,
+    InMemoryDependencyRepository,
+)
+from programsaathi.repositories.risk_blocker import (
+    RiskRepository,
+    InMemoryRiskRepository,
+    BlockerRepository,
+    InMemoryBlockerRepository,
+)
+from programsaathi.repositories.governance import (
+    DecisionRepository,
+    InMemoryDecisionRepository,
+    ScopeChangeRepository,
+    InMemoryScopeChangeRepository,
+    ApprovalRequestRepository,
+    InMemoryApprovalRequestRepository,
+    ProjectEventRepository,
+    InMemoryProjectEventRepository,
+    MeetingRepository,
+    InMemoryMeetingRepository,
+    ActionItemRepository,
+    InMemoryActionItemRepository,
+)
+from programsaathi.repositories.document import (
+    DocumentRepository,
+    InMemoryDocumentRepository,
+    DocumentVersionRepository,
+    InMemoryDocumentVersionRepository,
+)
+
+__all__ = [
+    "BaseRepository",
+    "InMemoryRepository",
+    "ProjectRepository",
+    "InMemoryProjectRepository",
+    "MilestoneRepository",
+    "InMemoryMilestoneRepository",
+    "StakeholderRepository",
+    "InMemoryStakeholderRepository",
+    "RequirementRepository",
+    "InMemoryRequirementRepository",
+    "UserStoryRepository",
+    "InMemoryUserStoryRepository",
+    "TaskRepository",
+    "InMemoryTaskRepository",
+    "DependencyRepository",
+    "InMemoryDependencyRepository",
+    "RiskRepository",
+    "InMemoryRiskRepository",
+    "BlockerRepository",
+    "InMemoryBlockerRepository",
+    "DecisionRepository",
+    "InMemoryDecisionRepository",
+    "ScopeChangeRepository",
+    "InMemoryScopeChangeRepository",
+    "ApprovalRequestRepository",
+    "InMemoryApprovalRequestRepository",
+    "ProjectEventRepository",
+    "InMemoryProjectEventRepository",
+    "MeetingRepository",
+    "InMemoryMeetingRepository",
+    "ActionItemRepository",
+    "InMemoryActionItemRepository",
+    "DocumentRepository",
+    "InMemoryDocumentRepository",
+    "DocumentVersionRepository",
+    "InMemoryDocumentVersionRepository",
+]
