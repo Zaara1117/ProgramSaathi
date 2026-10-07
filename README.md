@@ -105,11 +105,12 @@ ProgramSaathi implements 17 core domain models backed by Pydantic v2 validation:
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started & Azure Setup
 
 ### 1. Prerequisites
-- Python 3.11+ (Python 3.13 supported)
+- Python 3.11+ (Python 3.13 tested)
 - Git
+- Azure CLI (`az`) for Entra ID authentication (optional for local API key dev)
 
 ### 2. Setup Environment
 ```bash
@@ -124,23 +125,51 @@ python -m venv .venv
 # On Linux/macOS:
 source .venv/bin/activate
 
-# Install dependencies
-pip install -e ".[dev]"
+# Install dependencies (including Azure packages)
+pip install -e ".[dev,azure]"
 ```
 
 ### 3. Configure Environment Variables
-Copy `.env.example` to `.env` and populate with configuration:
+Copy `.env.example` to `.env` and configure your Azure settings:
 ```bash
 cp .env.example .env
 ```
-*(Note: Phase 1 operates completely offline using in-memory fallbacks without requiring live Azure credentials.)*
 
-### 4. Run the Test Suite
+#### Required Environment Variables for Azure OpenAI / Foundry:
+- `AZURE_OPENAI_ENDPOINT` or `FOUNDRY_PROJECT_ENDPOINT`: The Azure OpenAI resource endpoint URL (e.g. `https://<resource-name>.openai.azure.com/`).
+- `FOUNDRY_MODEL` or `AZURE_OPENAI_DEPLOYMENT_NAME`: Name of your deployed model (default: `gpt-4o`).
+- `AZURE_OPENAI_API_VERSION`: Target REST API version (default: `2024-06-01`).
+- `AZURE_OPENAI_API_KEY`: API key. *(Optional if using DefaultAzureCredential)*.
+- `USE_AZURE_AD`: Set to `true` to enforce Entra ID authentication via `DefaultAzureCredential`.
+
+### 4. Local Azure Authentication Instructions
+ProgramSaathi strongly prefers passwordless authentication using Azure Entra ID and `DefaultAzureCredential`.
+
+To authenticate your local workstation:
+1. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+2. Run login in your terminal:
+   ```bash
+   az login
+   ```
+3. Set your active Azure subscription:
+   ```bash
+   az account set --subscription "<Your-Subscription-ID>"
+   ```
+4. Ensure your account is assigned the **Cognitive Services OpenAI User** role on the Azure OpenAI / Foundry resource.
+5. In `.env`, provide `AZURE_OPENAI_ENDPOINT` and leave `AZURE_OPENAI_API_KEY` empty. `FoundryLLMService` will automatically acquire Bearer tokens.
+
+### 5. Running Tests & Verifying Foundry Connection
+Run the complete automated test suite (works offline without requiring live credentials):
 ```bash
 pytest -v
 ```
 
-### 5. Run the Application Bootstrap
+To run the live Azure Foundry smoke test (only executes if Azure credentials are configured in `.env`):
+```bash
+pytest tests/integration/test_azure_smoke.py -v
+```
+
+### 6. Run the Application Bootstrap
 ```bash
 python -m programsaathi.main
 ```
@@ -149,7 +178,7 @@ python -m programsaathi.main
 
 ## 🗺️ Implementation Roadmap
 
-- [x] **Phase 1: Python Foundation & Domain Models** (Current)
+- [x] **Phase 1: Python Foundation & Domain Models**
   - Full modular directory structure
   - 17 Pydantic domain models with strict validation
   - Configuration management via Pydantic Settings
@@ -160,7 +189,15 @@ python -m programsaathi.main
   - Master Orchestrator bootstrap
   - Complete Azure SQL schema (`schema.sql`)
   - Unit, integration, and security test suites
-- [ ] **Phase 2: Azure AI Foundry & Azure OpenAI Client Integration**
+- [x] **Phase 2: Azure AI Foundry & Azure OpenAI Client Integration** (Current)
+  - Live `AzureOpenAI` SDK client inside `FoundryLLMService`
+  - Dual authentication: `DefaultAzureCredential` (Entra ID) with API key fallback
+  - Structured outputs using Pydantic schema validation (`beta.chat.completions.parse`)
+  - Master ProgramSaathi system prompt
+  - Prompt templates for project understanding, requirement extraction, summarization
+  - Grounded reasoning pipeline (`generate_grounded` combining user request + project context + retrieved evidence)
+  - Strict validation error handling preventing unauthorized state writes
+  - Comprehensive unit test suite (mocking and error handling) and live smoke test
 - [ ] **Phase 3: Azure SQL Database Connection & Migration Pipeline**
 - [ ] **Phase 4: Azure Blob Storage Document Lake**
 - [ ] **Phase 5: Document Ingestion, Parsing & Normalization**

@@ -22,9 +22,12 @@ class Settings(BaseSettings):
 
     # Microsoft Foundry / Azure OpenAI
     foundry_project_endpoint: Optional[str] = Field(default=None, description="Azure AI Foundry Project Endpoint")
+    azure_openai_endpoint: Optional[str] = Field(default=None, description="Azure OpenAI Endpoint URL")
     foundry_model: str = Field(default="gpt-4o", description="Model deployment name")
-    azure_openai_api_key: Optional[str] = Field(default=None, description="Azure OpenAI API Key (optional if using Azure AD)")
+    azure_openai_deployment_name: Optional[str] = Field(default=None, description="Azure OpenAI Deployment name override")
+    azure_openai_api_key: Optional[str] = Field(default=None, description="Azure OpenAI API Key (optional if using DefaultAzureCredential)")
     azure_openai_api_version: str = Field(default="2024-06-01", description="API Version")
+    use_azure_ad: bool = Field(default=False, description="Explicitly use Azure AD / DefaultAzureCredential instead of API key")
 
     # Azure Blob Storage
     azure_storage_account_url: Optional[str] = Field(default=None, description="Azure Storage Account Blob URL")
@@ -62,8 +65,16 @@ class Settings(BaseSettings):
         return self.environment.lower() == "production"
 
     @property
+    def effective_llm_endpoint(self) -> Optional[str]:
+        return self.azure_openai_endpoint or self.foundry_project_endpoint
+
+    @property
+    def effective_llm_model(self) -> str:
+        return self.azure_openai_deployment_name or self.foundry_model
+
+    @property
     def is_llm_configured(self) -> bool:
-        return bool(self.foundry_project_endpoint or self.azure_openai_api_key)
+        return bool(self.foundry_project_endpoint or self.azure_openai_endpoint or self.azure_openai_api_key)
 
     @property
     def is_storage_configured(self) -> bool:
